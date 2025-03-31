@@ -99,30 +99,38 @@ result= vk.get_photos(user_id, count=5)
 #pprint(result)
 
 
-result_list = []
+result_dict = {}
 for photo in result['response']['items']:
-    max_size = max(photo['sizes'], key=lambda x: x['height'])
+    max_size = max(photo['sizes'], key=lambda size: size['height'] * size['width'])
     res = {
         'likes': photo['likes']['count'],
         'date': photo['date'],
         'max_height': max_size['height'],
         'max_width': max_size['width'],
-        'url': max_size['url']
+        'url': max_size['url'],
+        'max_size': max_size['height'] * max_size['width'],
+        'size': max_size['type']
     }
     res['name'] = res['likes']
-    if result_list:
-        for photo in result_list:
-            if res['name'] == photo['name']:
-                res['name'] =f"{res['likes']}{res['date']}"
-    res['name'] = str(res['name']) + '.jpg'
-    result_list.append(res)
+    if result_dict:
+        if res['name'] in result_dict.keys():
+            result_dict[ f"{res['likes']}{res['date']}"] = res
+    result_dict.setdefault(res['name'], res)
+#pprint(result_dict)
+    # res['name'] = res['likes']
+    # if result_list:
+    #     for photo in result_list:
+    #         if res['name'] == photo['name']:
+    #             res['name'] =f"{res['likes']}{res['date']}"
+    # res['name'] = str(res['name']) + '.jpg'
+    # result_list.append(res)
 #pprint(result_list)
 
 json_data = []
-for photo in result_list:
+for name, photo in result_dict.items():
     data = {
-        'file_name': str(photo['name']),
-        'size': str(photo['max_height'])                       
+        'file_name': str(name) + '.jpg',
+        'size': str(photo['size'])                       
     }
     json_data.append(data)
 
@@ -132,7 +140,7 @@ with open("json_result.json","w") as f:
 yd = YD()
 folder_name = 'api_course_work'
 yd.create_folder(folder_name)
-for photo in tqdm(result_list):
-    yd.yd_upload_photo(folder_name,photo['name'],photo['url'] )
+for name, photo in tqdm(result_dict.items()):
+    yd.yd_upload_photo(folder_name, str(name) + '.jpg', photo['url'])
 
     
