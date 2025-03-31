@@ -117,14 +117,6 @@ for photo in result['response']['items']:
             result_dict[ f"{res['likes']}{res['date']}"] = res
     result_dict.setdefault(res['name'], res)
 #pprint(result_dict)
-    # res['name'] = res['likes']
-    # if result_list:
-    #     for photo in result_list:
-    #         if res['name'] == photo['name']:
-    #             res['name'] =f"{res['likes']}{res['date']}"
-    # res['name'] = str(res['name']) + '.jpg'
-    # result_list.append(res)
-#pprint(result_list)
 
 json_data = []
 for name, photo in result_dict.items():
